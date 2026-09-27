@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -945,10 +944,6 @@ async function uploadFiles() {
 }
 
 
-/* ---------------------------------------------------------
-   CREATE FOLDER
---------------------------------------------------------- */
-
 async function createFolder() {
 
     if (!currentDirectory) return;
@@ -982,12 +977,6 @@ async function createFolder() {
     }
 
 }
-
-
-/* ---------------------------------------------------------
-   READ DIRECTORY
---------------------------------------------------------- */
-
 async function getDirectoryItems(directory) {
 
     const items = [];
@@ -1029,11 +1018,6 @@ async function getDirectoryItems(directory) {
     return items;
 
 }
-
-
-/* ---------------------------------------------------------
-   RENDER FILES
---------------------------------------------------------- */
 
 async function renderFiles() {
 
@@ -1135,11 +1119,6 @@ async function renderFiles() {
 
 }
 
-
-/* ---------------------------------------------------------
-   FOLDER CARD
---------------------------------------------------------- */
-
 function createFolderCard(
     grid,
     item
@@ -1198,11 +1177,6 @@ function createFolderCard(
     grid.appendChild(card);
 
 }
-
-
-/* ---------------------------------------------------------
-   FILE CARD
---------------------------------------------------------- */
 
 async function createFileCard(
     grid,
@@ -1271,11 +1245,6 @@ async function createFileCard(
 
 }
 
-
-/* ---------------------------------------------------------
-   OPEN FOLDER
---------------------------------------------------------- */
-
 async function openFolder(handle) {
 
     directoryStack.push(
@@ -1290,12 +1259,6 @@ async function openFolder(handle) {
     await renderFiles();
 
 }
-
-
-/* ---------------------------------------------------------
-   GO BACK
---------------------------------------------------------- */
-
 async function goBack() {
 
     if (directoryStack.length === 0)
@@ -1334,11 +1297,6 @@ function openFile(file) {
     }, 60000);
 
 }
-
-
-/* ---------------------------------------------------------
-   RENAME
---------------------------------------------------------- */
 
 async function renameItem(item) {
 
@@ -1417,12 +1375,6 @@ async function renameItem(item) {
     }
 
 }
-
-
-/* ---------------------------------------------------------
-   COPY DIRECTORY
---------------------------------------------------------- */
-
 async function copyDirectory(
     source,
     destination
@@ -1474,11 +1426,6 @@ async function copyDirectory(
 
 }
 
-
-/* ---------------------------------------------------------
-   DELETE
---------------------------------------------------------- */
-
 async function deleteItem(item) {
 
     const confirmed =
@@ -1514,11 +1461,6 @@ async function deleteItem(item) {
 
 }
 
-
-/* ---------------------------------------------------------
-   REFRESH
---------------------------------------------------------- */
-
 async function refreshFiles() {
 
     await renderFiles();
@@ -1526,11 +1468,6 @@ async function refreshFiles() {
     showToast("Refreshed");
 
 }
-
-
-/* ---------------------------------------------------------
-   BREADCRUMB
---------------------------------------------------------- */
 
 function updateBreadcrumb() {
 
@@ -1554,11 +1491,6 @@ function updateBreadcrumb() {
 
 }
 
-
-/* =========================================================
-   LINKS
-========================================================= */
-
 function getLinks() {
 
     try {
@@ -1577,20 +1509,13 @@ function getLinks() {
 
 }
 
-
 function saveLinks(links) {
 
     localStorage.setItem(
         "vaultLinks",
         JSON.stringify(links)
     );
-
 }
-
-
-/* ---------------------------------------------------------
-   OPEN MODAL
---------------------------------------------------------- */
 
 function openLinkModal() {
 
@@ -1605,11 +1530,6 @@ function openLinkModal() {
 
 }
 
-
-/* ---------------------------------------------------------
-   CLOSE MODAL
---------------------------------------------------------- */
-
 function closeLinkModal() {
 
     document
@@ -1618,11 +1538,6 @@ function closeLinkModal() {
         .remove("show");
 
 }
-
-
-/* ---------------------------------------------------------
-   SAVE LINK
---------------------------------------------------------- */
 
 function saveLink() {
 
@@ -1709,11 +1624,6 @@ function saveLink() {
     showToast("Link saved");
 
 }
-
-
-/* ---------------------------------------------------------
-   RENDER LINKS
---------------------------------------------------------- */
 
 function renderLinks() {
 
@@ -1857,18 +1767,11 @@ function renderLinks() {
 
         };
 
-
         container.appendChild(card);
 
     });
 
 }
-
-
-/* =========================================================
-   UTILITIES
-========================================================= */
-
 function getExtension(name) {
 
     const parts =
@@ -1883,13 +1786,11 @@ function getExtension(name) {
 
 }
 
-
 function getFileIcon(name) {
 
     const ext =
         getExtension(name)
             .toLowerCase();
-
     const icons = {
 
         pdf: "📕",
@@ -1939,12 +1840,8 @@ function getFileIcon(name) {
         csv: "📊"
 
     };
-
     return icons[ext] || "📄";
-
 }
-
-
 function formatBytes(bytes) {
 
     if (bytes === 0)
@@ -1963,7 +1860,6 @@ function formatBytes(bytes) {
             Math.log(bytes) /
             Math.log(1024)
         );
-
     return (
         bytes /
         Math.pow(1024, i)
@@ -1972,8 +1868,6 @@ function formatBytes(bytes) {
     ) + " " + units[i];
 
 }
-
-
 function escapeHTML(value) {
 
     return String(value)
@@ -1984,12 +1878,6 @@ function escapeHTML(value) {
         .replaceAll("'", "&#039;");
 
 }
-
-
-/* ---------------------------------------------------------
-   TOAST
---------------------------------------------------------- */
-
 let toastTimer;
 
 function showToast(message) {
@@ -2017,16 +1905,9 @@ function showToast(message) {
         }, 3000);
 
 }
-
-
-/* ---------------------------------------------------------
-   INITIALIZE
---------------------------------------------------------- */
-
 renderLinks();
 
 </script>
 
 </body>
 </html>
-```
