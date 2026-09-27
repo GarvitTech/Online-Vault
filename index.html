@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <title>My Cloud Drive</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#080b14;--panel:#101522;--panel2:#151b2b;--line:#252d40;
+      --text:#f5f7fb;--muted:#9ba5ba;--accent:#7c5cff;--danger:#ff5c72;
+      --ok:#36d399;--shadow:0 18px 60px rgba(0,0,0,.28)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top,#151a31 0,#080b14 48%);
+      color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+    .app{min-height:100vh}
+    .topbar{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+      justify-content:space-between;padding:0 22px;background:rgba(8,11,20,.86);backdrop-filter:blur(18px);
+      position:sticky;top:0;z-index:20}
+    .brand{font-weight:800;letter-spacing:-.03em;font-size:20px}
+    .brand span{color:#9c8cff}
+    .userbox{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+    .btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:11px}
+    .btn:hover{background:var(--panel2)}
+    .btn.primary{background:var(--accent);border-color:var(--accent)}
+    .btn.danger{border-color:#5d2631;color:#ff9aaa}
+    .shell{max-width:1280px;margin:auto;padding:28px 20px}
+    .auth{max-width:430px;margin:9vh auto;background:rgba(16,21,34,.92);border:1px solid var(--line);
+      border-radius:22px;padding:30px;box-shadow:var(--shadow)}
+    h1,h2{margin:0 0 8px}
+    .sub{color:var(--muted);margin:0 0 25px}
+    .field{margin:14px 0}
+    .field label{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}
+    .field input{width:100%;background:#0b0f1a;border:1px solid var(--line);color:var(--text);
+      padding:12px;border-radius:10px;outline:none}
+    .field input:focus{border-color:var(--accent)}
+    .auth-actions{display:flex;gap:10px;margin-top:18px}
+    .auth-actions .btn{flex:1}
+    .message{margin-top:15px;color:var(--muted);font-size:13px;min-height:20px}
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+    .search{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);
+      color:var(--text);padding:11px 13px;border-radius:11px;outline:none}
+    .crumbs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:18px;color:var(--muted);font-size:14px}
+    .crumb{background:none;border:0;color:#cbd2e1;padding:0}
+    .crumb:hover{color:#fff}
+    .drop{border:1px dashed #3a4560;background:rgba(16,21,34,.65);border-radius:18px;padding:28px;text-align:center;
+      margin-bottom:20px;transition:.15s}
+    .drop.drag{border-color:#9c8cff;background:rgba(124,92,255,.10);transform:scale(1.005)}
+    .drop strong{display:block;font-size:17px}
+    .drop span{display:block;color:var(--muted);margin:6px 0 14px;font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:13px}
+    .card{background:rgba(16,21,34,.9);border:1px solid var(--line);border-radius:15px;padding:16px;
+      min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+    .icon{font-size:30px;margin-bottom:10px}
+    .name{font-weight:650;word-break:break-word}
+    .meta{color:var(--muted);font-size:12px;margin-top:5px}
+    .card-actions{display:flex;gap:7px;margin-top:14px}
+    .card-actions .btn{padding:7px 9px;font-size:12px;flex:1}
+    .empty{padding:55px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:15px}
+    .progress-wrap{margin:14px 0;display:none}
+    .progress-wrap.show{display:block}
+    progress{width:100%;height:8px}
+    .status{color:var(--muted);font-size:13px;margin-top:7px}
+    .footer{color:#657087;text-align:center;font-size:12px;padding:30px}
+    @media(max-width:700px){
+      .topbar{padding:0 13px}.shell{padding:18px 12px}.userbox span{display:none}
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .card{min-height:145px;padding:12px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">My <span>Cloud Drive</span></div>
+    <div id="userbox" class="userbox hidden">
+      <span id="userEmail"></span>
+      <button id="logoutBtn" class="btn">Sign out</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="authView" class="auth">
+      <h1>Private cloud drive</h1>
+      <p class="sub">Sign in to access your files from anywhere.</p>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+
+      <div class="auth-actions">
+        <button id="loginBtn" class="btn primary">Sign in</button>
+        <button id="signupBtn" class="btn">Create account</button>
+      </div>
+
+      <div id="authMessage" class="message"></div>
+    </section>
+
+    <section id="driveView" class="hidden">
+      <div class="toolbar">
+        <button id="backBtn" class="btn">← Back</button>
+        <button id="rootBtn" class="btn">My Drive</button>
+        <input id="search" class="search" placeholder="Search files and folders…">
+        <button id="newFolderBtn" class="btn">＋ Folder</button>
+        <button id="uploadBtn" class="btn primary">↑ Upload</button>
+        <input id="filePicker" type="file" multiple hidden>
+      </div>
+
+      <div id="crumbs" class="crumbs"></div>
+
+      <div id="dropZone" class="drop">
+        <strong>Drop files here to upload</strong>
+        <span>Files are stored privately in your cloud storage.</span>
+        <button id="dropChoose" class="btn">Choose files</button>
+      </div>
+
+      <div id="progressWrap" class="progress-wrap">
+        <progress id="progress" max="100" value="0"></progress>
+        <div id="progressStatus" class="status"></div>
+      </div>
+
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <div class="footer">Private cloud drive • Keep independent backups of important files.</div>
+  </main>
+</div>
+
+<script>
+/*
+  ============================================================
+  CONFIGURATION
+  ============================================================
+*/
+const SUPABASE_URL = "https://rhxtlvlrxcvpxdywceqy.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_RqgKUeeRH4WAdv62eOw5lw_cLz2oubA";
+
+if (SUPABASE_URL.startsWith("YOUR_") || SUPABASE_ANON_KEY.startsWith("YOUR_")) {
+  document.getElementById("authMessage").textContent =
+    "Configure SUPABASE_URL and SUPABASE_ANON_KEY in index.html first.";
+}
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/*
+  ============================================================
+  STATE
+  ============================================================
+*/
+let currentUser = null;
+let currentFolder = null;
+let folderCache = new Map();
+let searchTimer = null;
+
+/*
+  ============================================================
+  DOM
+  ============================================================
+*/
+const authView = document.getElementById("authView");
+const driveView = document.getElementById("driveView");
+const userbox = document.getElementById("userbox");
+const userEmail = document.getElementById("userEmail");
+const authMessage = document.getElementById("authMessage");
+const grid = document.getElementById("grid");
+const crumbs = document.getElementById("crumbs");
+const search = document.getElementById("search");
+const dropZone = document.getElementById("dropZone");
+const filePicker = document.getElementById("filePicker");
+const progressWrap = document.getElementById("progressWrap");
+const progress = document.getElementById("progress");
+const progressStatus = document.getElementById("progressStatus");
+
+/*
+  ============================================================
+  HELPERS
+  ============================================================
+*/
+function esc(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return "0 B";
+  const units = ["B","KB","MB","GB","TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024,i)).toFixed(i ? 1 : 0)} ${units[i]}`;
+}
+
+function iconFor(name, isFolder=false) {
+  if (isFolder) return "📁";
+  const ext = name.split(".").pop().toLowerCase();
+  if (["jpg","jpeg","png","gif","webp","svg"].includes(ext)) return "🖼️";
+  if (["mp4","mov","mkv","webm","avi"].includes(ext)) return "🎬";
+  if (["mp3","wav","ogg","m4a"].includes(ext)) return "🎵";
+  if (["pdf"].includes(ext)) return "📕";
+  if (["zip","rar","7z","tar","gz"].includes(ext)) return "🗜️";
+  if (["doc","docx","txt","md"].includes(ext)) return "📄";
+  if (["xls","xlsx","csv"].includes(ext)) return "📊";
+  if (["ppt","pptx"].includes(ext)) return "📽️";
+  if (["js","ts","py","cpp","c","h","html","css","json"].includes(ext)) return "💻";
+  return "📄";
+}
+
+function setAuthMessage(text, error=false) {
+  authMessage.textContent = text || "";
+  authMessage.style.color = error ? "#ff9aaa" : "";
+}
+
+function setProgress(show, value=0, status="") {
+  progressWrap.classList.toggle("show", show);
+  progress.value = value;
+  progressStatus.textContent = status;
+}
+
+/*
+  ============================================================
+  AUTH
+  ============================================================
+*/
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) return setAuthMessage("Enter email and password.", true);
+
+  setAuthMessage("Signing in…");
+
+  const { error } = await db.auth.signInWithPassword({ email, password });
+
+  if (error) setAuthMessage(error.message, true);
+}
+
+async function signup() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || password.length < 8) {
+    return setAuthMessage("Use a valid email and a password of at least 8 characters.", true);
+  }
+
+  setAuthMessage("Creating account…");
+
+  const { data, error } = await db.auth.signUp({ email, password });
+
+  if (error) return setAuthMessage(error.message, true);
+
+  if (data.session) {
+    setAuthMessage("Account created.");
+  } else {
+    setAuthMessage("Account created. Check your email if confirmation is enabled.");
+  }
+}
+
+async function logout() {
+  await db.auth.signOut();
+}
+
+function showLoggedOut() {
+  currentUser = null;
+  currentFolder = null;
+  authView.classList.remove("hidden");
+  driveView.classList.add("hidden");
+  userbox.classList.add("hidden");
+  grid.innerHTML = "";
+}
+
+async function showLoggedIn(user) {
+  currentUser = user;
+  authView.classList.add("hidden");
+  driveView.classList.remove("hidden");
+  userbox.classList.remove("hidden");
+  userEmail.textContent = user.email || "";
+
+  await openRoot();
+}
+
+/*
+  ============================================================
+  FOLDERS
+  ============================================================
+*/
+async function ensureRoot() {
+  const { data, error } = await db.rpc("ensure_root_folder");
+  if (error) throw error;
+
+  const { data: root, error: rootError } = await db
+    .from("folders")
+    .select("*")
+    .eq("id", data)
+    .single();
+
+  if (rootError) throw rootError;
+  return root;
+}
+
+async function openRoot() {
+  try {
+    const root = await ensureRoot();
+    currentFolder = root;
+    await renderCurrentFolder();
+  } catch (e) {
+    renderError(e);
+  }
+}
+
+async function openFolder(folder) {
+  currentFolder = folder;
+  search.value = "";
+  await renderCurrentFolder();
+}
+
+async function createFolder() {
+  const name = prompt("Folder name:");
+  if (!name || !name.trim()) return;
+
+  const { error } = await db.from("folders").insert({
+    user_id: currentUser.id,
+    parent_id: currentFolder.id,
+    name: name.trim()
+  });
+
+  if (error) return alert(error.message);
+  await renderCurrentFolder();
+}
+
+async function renameFolder(folder) {
+  const name = prompt("New folder name:", folder.name);
+  if (!name || !name.trim()) return;
+
+  const { error } = await db
+    .from("folders")
+    .update({ name: name.trim() })
+    .eq("id", folder.id);
+
+  if (error) return alert(error.message);
+  await renderCurrentFolder();
+}
+
+async function deleteFolder(folder) {
+  if (folder.id === currentFolder.id && folder.parent_id === null) {
+    return alert("The root folder cannot be deleted.");
+  }
+
+  if (!confirm(`Delete "${folder.name}" and everything inside it?`)) return;
+
+  try {
+    const { data: descendants, error: treeError } =
+      await db.rpc("get_folder_tree", { root_folder: folder.id });
+
+    if (treeError) throw treeError;
+
+    const ids = (descendants || []).map(x => x.id);
+
+    if (ids.length) {
+      const { data: files, error: fileError } = await db
+        .from("files")
+        .select("id, storage_path")
+        .in("folder_id", ids);
+
+      if (fileError) throw fileError;
+
+      if (files?.length) {
+        const paths = files.map(f => f.storage_path);
+        const { error: storageError } =
+          await db.storage.from("vault").remove(paths);
+
+        if (storageError) throw storageError;
+      }
+    }
+
+    const { error } = await db
+      .from("folders")
+      .delete()
+      .eq("id", folder.id);
+
+    if (error) throw error;
+
+    await openRoot();
+  } catch (e) {
+    alert(e.message || String(e));
+  }
+}
+
+/*
+  ============================================================
+  FILES
+  ============================================================
+*/
+async function loadItems() {
+  const [{ data: folders, error: folderError }, { data: files, error: fileError }] =
+    await Promise.all([
+      db.from("folders").select("*").eq("parent_id", currentFolder.id).order("name"),
+      db.from("files").select("*").eq("folder_id", currentFolder.id).order("name")
+    ]);
+
+  if (folderError) throw folderError;
+  if (fileError) throw fileError;
+
+  return { folders: folders || [], files: files || [] };
+}
+
+async function uploadFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+
+  setProgress(true, 0, `Uploading 0 / ${files.length}…`);
+
+  let done = 0;
+
+  for (const file of files) {
+    try {
+      const fileId = crypto.randomUUID();
+      const storagePath = `${currentUser.id}/${currentFolder.id}/${fileId}`;
+
+      const { error: uploadError } = await db.storage
+        .from("vault")
+        .upload(storagePath, file, {
+          contentType: file.type || "application/octet-stream",
+          upsert: false,
+          cacheControl: "3600"
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { error: dbError } = await db.from("files").insert({
+        id: fileId,
+        user_id: currentUser.id,
+        folder_id: currentFolder.id,
+        name: file.name,
+        storage_path: storagePath,
+        mime_type: file.type || "application/octet-stream",
+        size_bytes: file.size
+      });
+
+      if (dbError) {
+        await db.storage.from("vault").remove([storagePath]);
+        throw dbError;
+      }
+
+      done++;
+      setProgress(true, Math.round(done / files.length * 100),
+        `Uploaded ${done} / ${files.length}: ${file.name}`);
+    } catch (e) {
+      alert(`Could not upload "${file.name}": ${e.message || e}`);
+    }
+  }
+
+  setProgress(true, 100, `Finished: ${done} / ${files.length} uploaded.`);
+  await renderCurrentFolder();
+
+  setTimeout(() => setProgress(false), 1800);
+}
+
+async function downloadFile(file) {
+  try {
+    const { data, error } = await db.storage
+      .from("vault")
+      .download(file.storage_path);
+
+    if (error) throw error;
+
+    const url = URL.createObjectURL(data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
+  } catch (e) {
+    alert(`Download failed: ${e.message || e}`);
+  }
+}
+
+async function renameFile(file) {
+  const name = prompt("New file name:", file.name);
+  if (!name || !name.trim()) return;
+
+  const clean = name.trim();
+
+  const { data: existing } = await db
+    .from("files")
+    .select("id")
+    .eq("folder_id", currentFolder.id)
+    .eq("name", clean)
+    .neq("id", file.id)
+    .maybeSingle();
+
+  if (existing) return alert("A file with that name already exists.");
+
+  const { error } = await db
+    .from("files")
+    .update({ name: clean })
+    .eq("id", file.id);
+
+  if (error) return alert(error.message);
+  await renderCurrentFolder();
+}
+
+async function deleteFile(file) {
+  if (!confirm(`Delete "${file.name}"?`)) return;
+
+  try {
+    const { error: storageError } =
+      await db.storage.from("vault").remove([file.storage_path]);
+
+    if (storageError) throw storageError;
+
+    const { error } = await db
+      .from("files")
+      .delete()
+      .eq("id", file.id);
+
+    if (error) throw error;
+
+    await renderCurrentFolder();
+  } catch (e) {
+    alert(`Delete failed: ${e.message || e}`);
+  }
+}
+
+/*
+  ============================================================
+  SEARCH
+  ============================================================
+*/
+async function searchEverything(term) {
+  const q = term.trim();
+  if (!q) return renderCurrentFolder();
+
+  const [{ data: folders, error: fErr }, { data: files, error: fiErr }] =
+    await Promise.all([
+      db.from("folders")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .ilike("name", `%${q}%`)
+        .order("name"),
+      db.from("files")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .ilike("name", `%${q}%`)
+        .order("name")
+    ]);
+
+  if (fErr) throw fErr;
+  if (fiErr) throw fiErr;
+
+  renderItems(folders || [], files || [], true);
+}
+
+/*
+  ============================================================
+  RENDER
+  ============================================================
+*/
+async function renderCurrentFolder() {
+  try {
+    const { folders, files } = await loadItems();
+    renderBreadcrumbs();
+    renderItems(folders, files, false);
+  } catch (e) {
+    renderError(e);
+  }
+}
+
+function renderBreadcrumbs() {
+  crumbs.innerHTML = "";
+
+  const rootButton = document.createElement("button");
+  rootButton.className = "crumb";
+  rootButton.textContent = "My Drive";
+  rootButton.onclick = openRoot;
+  crumbs.appendChild(rootButton);
+
+  if (currentFolder && currentFolder.parent_id) {
+    const sep = document.createElement("span");
+    sep.textContent = "›";
+    crumbs.appendChild(sep);
+
+    const current = document.createElement("span");
+    current.textContent = currentFolder.name;
+    crumbs.appendChild(current);
+  }
+}
+
+function renderItems(folders, files, isSearch) {
+  if (!folders.length && !files.length) {
+    grid.innerHTML = `<div class="empty">${isSearch ? "No matching items." : "This folder is empty. Drop files here to upload."}</div>`;
+    return;
+  }
+
+  grid.innerHTML = "";
+
+  for (const folder of folders) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <div>
+        <div class="icon">📁</div>
+        <div class="name">${esc(folder.name)}</div>
+        <div class="meta">Folder</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn open">Open</button>
+        <button class="btn rename">Rename</button>
+        <button class="btn danger delete">Delete</button>
+      </div>
+    `;
+
+    card.querySelector(".open").onclick = () => openFolder(folder);
+    card.querySelector(".rename").onclick = () => renameFolder(folder);
+    card.querySelector(".delete").onclick = () => deleteFolder(folder);
+
+    grid.appendChild(card);
+  }
+
+  for (const file of files) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <div>
+        <div class="icon">${iconFor(file.name)}</div>
+        <div class="name">${esc(file.name)}</div>
+        <div class="meta">${formatBytes(file.size_bytes)} • ${esc(file.mime_type)}</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn download">Download</button>
+        <button class="btn rename">Rename</button>
+        <button class="btn danger delete">Delete</button>
+      </div>
+    `;
+
+    card.querySelector(".download").onclick = () => downloadFile(file);
+    card.querySelector(".rename").onclick = () => renameFile(file);
+    card.querySelector(".delete").onclick = () => deleteFile(file);
+
+    grid.appendChild(card);
+  }
+}
+
+function renderError(e) {
+  grid.innerHTML = `<div class="empty">Error: ${esc(e?.message || e)}</div>`;
+}
+
+/*
+  ============================================================
+  DRAG + DROP
+  ============================================================
+*/
+for (const eventName of ["dragover","drop"]) {
+  window.addEventListener(eventName, e => e.preventDefault());
+}
+
+dropZone.addEventListener("dragenter", e => {
+  e.preventDefault();
+  dropZone.classList.add("drag");
+});
+
+dropZone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropZone.classList.add("drag");
+});
+
+dropZone.addEventListener("dragleave", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag");
+});
+
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag");
+  uploadFiles(e.dataTransfer.files);
+});
+
+/*
+  ============================================================
+  EVENTS
+  ============================================================
+*/
+document.getElementById("loginBtn").onclick = login;
+document.getElementById("signupBtn").onclick = signup;
+document.getElementById("logoutBtn").onclick = logout;
+
+document.getElementById("newFolderBtn").onclick = createFolder;
+document.getElementById("uploadBtn").onclick = () => filePicker.click();
+document.getElementById("dropChoose").onclick = () => filePicker.click();
+
+filePicker.onchange = async () => {
+  await uploadFiles(filePicker.files);
+  filePicker.value = "";
+};
+
+document.getElementById("rootBtn").onclick = openRoot;
+
+document.getElementById("backBtn").onclick = async () => {
+  if (!currentFolder || !currentFolder.parent_id) return;
+  const { data, error } = await db
+    .from("folders")
+    .select("*")
+    .eq("id", currentFolder.parent_id)
+    .single();
+
+  if (error) return alert(error.message);
+  await openFolder(data);
+};
+
+search.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    try {
+      await searchEverything(search.value);
+    } catch (e) {
+      renderError(e);
+    }
+  }, 250);
+});
+
+/*
+  ============================================================
+  SESSION
+  ============================================================
+*/
+db.auth.onAuthStateChange((_event, session) => {
+  if (session?.user) showLoggedIn(session.user);
+  else showLoggedOut();
+});
+
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) await showLoggedIn(session.user);
+})();
+</script>
+</body>
+</html>
