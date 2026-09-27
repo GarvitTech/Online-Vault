@@ -1,0 +1,2032 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My File Vault</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #090b10;
+    --panel: #11141b;
+    --panel2: #171b23;
+    --border: #272d38;
+    --text: #f5f7fa;
+    --muted: #8b95a5;
+    --accent: #ffffff;
+    --danger: #ff5f56;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ---------------- HEADER ---------------- */
+
+header {
+    border-bottom: 1px solid var(--border);
+    background: rgba(9, 11, 16, 0.92);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(16px);
+}
+
+.header-inner {
+    max-width: 1250px;
+    margin: auto;
+    padding: 18px 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+
+    display: grid;
+    place-items: center;
+
+    background: var(--panel2);
+    border: 1px solid var(--border);
+
+    font-size: 21px;
+}
+
+.brand h1 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.brand small {
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+}
+
+/* ---------------- MAIN ---------------- */
+
+main {
+    max-width: 1250px;
+    margin: auto;
+    padding: 35px 24px 80px;
+}
+
+/* ---------------- WELCOME ---------------- */
+
+.hero {
+    padding: 35px 0;
+}
+
+.hero h2 {
+    font-size: clamp(32px, 5vw, 58px);
+    letter-spacing: -2px;
+    margin: 0;
+}
+
+.hero p {
+    max-width: 700px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+/* ---------------- BUTTONS ---------------- */
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.primary {
+    background: white;
+    color: black;
+    border: 0;
+    padding: 12px 17px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.primary:hover {
+    background: #dfe3e8;
+}
+
+.secondary {
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 11px 16px;
+    border-radius: 10px;
+}
+
+.secondary:hover {
+    background: #1d222b;
+}
+
+.danger {
+    color: #ff7b73;
+    border-color: #4b2524;
+}
+
+/* ---------------- VAULT BAR ---------------- */
+
+.vault-bar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.vault-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vault-icon {
+    font-size: 28px;
+}
+
+.vault-name {
+    font-weight: 700;
+}
+
+.vault-status {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ---------------- SEARCH ---------------- */
+
+.search {
+    margin: 25px 0;
+
+    display: flex;
+    gap: 10px;
+}
+
+.search input {
+    width: 100%;
+    padding: 15px 18px;
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    color: white;
+    outline: none;
+    font-size: 15px;
+}
+
+.search input:focus {
+    border-color: #596273;
+}
+
+/* ---------------- TOOLBAR ---------------- */
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 20px 0;
+
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.breadcrumb {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.toolbar-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ---------------- FILE GRID ---------------- */
+
+.grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fill, minmax(245px, 1fr));
+
+    gap: 14px;
+}
+
+/* ---------------- FILE CARD ---------------- */
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        background .18s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: #424957;
+    background: #151921;
+}
+
+.card-icon {
+    font-size: 34px;
+    margin-bottom: 14px;
+}
+
+.card-name {
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.card-meta {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 7px;
+    margin-top: 16px;
+}
+
+.card-actions button {
+    flex: 1;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: white;
+}
+
+.card-actions button:hover {
+    background: #242a34;
+}
+
+/* ---------------- EMPTY ---------------- */
+
+.empty {
+    padding: 70px 20px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.empty-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+/* ---------------- LINKS ---------------- */
+
+.section {
+    margin-top: 65px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 17px;
+}
+
+.section-title h2 {
+    margin: 0;
+}
+
+.links-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fill, minmax(280px, 1fr));
+
+    gap: 14px;
+}
+
+.link-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.link-title {
+    font-weight: 700;
+}
+
+.link-url {
+    color: #8791a2;
+    font-size: 12px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    margin-top: 7px;
+}
+
+.link-description {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.link-actions {
+    display: flex;
+    gap: 7px;
+    margin-top: 15px;
+}
+
+.link-actions button {
+    flex: 1;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: white;
+}
+
+/* ---------------- MODAL ---------------- */
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,.65);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 100;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    width: min(500px, 100%);
+
+    background: #12151c;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    padding: 24px;
+}
+
+.modal-box h2 {
+    margin-top: 0;
+}
+
+.modal-box input,
+.modal-box textarea {
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 16px;
+
+    padding: 13px;
+
+    background: #0c0f14;
+    border: 1px solid var(--border);
+
+    color: white;
+    border-radius: 9px;
+
+    outline: none;
+    font-family: inherit;
+}
+
+.modal-box textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* ---------------- TOAST ---------------- */
+
+.toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+
+    background: #171b23;
+    border: 1px solid var(--border);
+
+    padding: 14px 18px;
+    border-radius: 11px;
+
+    transform: translateY(100px);
+    opacity: 0;
+
+    transition: .25s;
+
+    z-index: 200;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ---------------- MOBILE ---------------- */
+
+@media(max-width: 650px) {
+
+    .header-inner {
+        padding: 15px;
+    }
+
+    main {
+        padding: 20px 15px 60px;
+    }
+
+    .hero {
+        padding: 25px 0;
+    }
+
+    .vault-bar {
+        align-items: flex-start;
+    }
+
+    .actions {
+        width: 100%;
+    }
+
+    .actions button {
+        flex: 1;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="header-inner">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🗄️
+            </div>
+
+            <div>
+                <h1>My File Vault</h1>
+                <small>Local storage</small>
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="hero">
+
+        <h2>Your files.<br>On your Mac.</h2>
+
+        <p>
+            A private, serverless file manager. Your browser works
+            directly with a folder you choose on your Mac.
+            Nothing is uploaded to the website.
+        </p>
+
+    </section>
+
+
+    <!-- VAULT -->
+
+    <section class="vault-bar">
+
+        <div class="vault-info">
+
+            <div class="vault-icon">
+                📁
+            </div>
+
+            <div>
+
+                <div class="vault-name" id="vaultName">
+                    No folder selected
+                </div>
+
+                <div class="vault-status" id="vaultStatus">
+                    Select your local vault folder to begin.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="actions">
+
+            <button
+                class="primary"
+                onclick="selectVault()"
+            >
+                📂 Select Vault
+            </button>
+
+            <button
+                class="secondary"
+                onclick="uploadFiles()"
+                id="uploadBtn"
+                disabled
+            >
+                📤 Upload
+            </button>
+
+            <button
+                class="secondary"
+                onclick="createFolder()"
+                id="folderBtn"
+                disabled
+            >
+                📁 New Folder
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <div class="search">
+
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="🔍 Search files and folders..."
+            oninput="renderFiles()"
+        >
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+
+    <div class="toolbar">
+
+        <div
+            class="breadcrumb"
+            id="breadcrumb"
+        >
+            Vault
+        </div>
+
+        <div class="toolbar-buttons">
+
+            <button
+                class="secondary"
+                onclick="goBack()"
+                id="backBtn"
+                disabled
+            >
+                ← Back
+            </button>
+
+            <button
+                class="secondary"
+                onclick="refreshFiles()"
+                id="refreshBtn"
+                disabled
+            >
+                ↻ Refresh
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILES -->
+
+    <section>
+
+        <div
+            class="grid"
+            id="fileGrid"
+        >
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📂
+                </div>
+
+                <h3>Select your vault folder</h3>
+
+                <p>
+                    Choose a folder on your Mac to start.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LINKS -->
+
+    <section class="section">
+
+        <div class="section-title">
+
+            <h2>🔗 Saved Links</h2>
+
+            <button
+                class="primary"
+                onclick="openLinkModal()"
+            >
+                + Add Link
+            </button>
+
+        </div>
+
+
+        <div
+            class="links-grid"
+            id="linksGrid"
+        ></div>
+
+    </section>
+
+</main>
+
+
+<!-- LINK MODAL -->
+
+<div
+    class="modal"
+    id="linkModal"
+>
+
+    <div class="modal-box">
+
+        <h2>Add Useful Link</h2>
+
+        <label>
+            Title
+        </label>
+
+        <input
+            id="linkTitle"
+            placeholder="GitHub Repository"
+        >
+
+        <label>
+            URL
+        </label>
+
+        <input
+            id="linkURL"
+            placeholder="https://github.com/..."
+        >
+
+        <label>
+            Description
+        </label>
+
+        <textarea
+            id="linkDescription"
+            placeholder="What is this link for?"
+        ></textarea>
+
+        <div class="modal-buttons">
+
+            <button
+                class="secondary"
+                onclick="closeLinkModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="primary"
+                onclick="saveLink()"
+            >
+                Save Link
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   FILE VAULT
+========================================================= */
+
+let vaultHandle = null;
+let currentDirectory = null;
+let directoryStack = [];
+
+
+/* ---------------------------------------------------------
+   CHECK SUPPORT
+--------------------------------------------------------- */
+
+if (!("showDirectoryPicker" in window)) {
+
+    showToast(
+        "Your browser does not support local folder access. Use Chrome or Edge."
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   SELECT VAULT
+--------------------------------------------------------- */
+
+async function selectVault() {
+
+    try {
+
+        const handle =
+            await window.showDirectoryPicker({
+                mode: "readwrite"
+            });
+
+        vaultHandle = handle;
+
+        currentDirectory = vaultHandle;
+
+        directoryStack = [];
+
+        document.getElementById("vaultName").textContent =
+            vaultHandle.name;
+
+        document.getElementById("vaultStatus").textContent =
+            "Connected locally";
+
+        document.getElementById("uploadBtn").disabled = false;
+
+        document.getElementById("folderBtn").disabled = false;
+
+        document.getElementById("refreshBtn").disabled = false;
+
+        await saveVaultHandle();
+
+        await renderFiles();
+
+        showToast("Vault connected");
+
+    } catch (error) {
+
+        console.log(error);
+
+        if (error.name !== "AbortError") {
+
+            showToast(
+                "Could not access the selected folder."
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   SAVE HANDLE
+--------------------------------------------------------- */
+
+async function saveVaultHandle() {
+
+    try {
+
+        localStorage.setItem(
+            "vaultName",
+            vaultHandle.name
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   UPLOAD FILES
+--------------------------------------------------------- */
+
+async function uploadFiles() {
+
+    if (!currentDirectory) return;
+
+    try {
+
+        const files =
+            await window.showOpenFilePicker({
+                multiple: true
+            });
+
+        for (const fileHandle of files) {
+
+            const file =
+                await fileHandle.getFile();
+
+            const newFile =
+                await currentDirectory.getFileHandle(
+                    file.name,
+                    {
+                        create: true
+                    }
+                );
+
+            const writable =
+                await newFile.createWritable();
+
+            await writable.write(file);
+
+            await writable.close();
+
+        }
+
+        showToast(
+            `${files.length} file(s) uploaded`
+        );
+
+        await renderFiles();
+
+    } catch (error) {
+
+        if (error.name !== "AbortError") {
+
+            console.error(error);
+
+            showToast("Upload failed");
+
+        }
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   CREATE FOLDER
+--------------------------------------------------------- */
+
+async function createFolder() {
+
+    if (!currentDirectory) return;
+
+    const name =
+        prompt("Enter folder name:");
+
+    if (!name) return;
+
+    try {
+
+        await currentDirectory.getDirectoryHandle(
+            name,
+            {
+                create: true
+            }
+        );
+
+        showToast("Folder created");
+
+        await renderFiles();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Could not create folder"
+        );
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   READ DIRECTORY
+--------------------------------------------------------- */
+
+async function getDirectoryItems(directory) {
+
+    const items = [];
+
+    for await (const [
+        name,
+        handle
+    ] of directory.entries()) {
+
+        items.push({
+            name,
+            handle,
+            kind: handle.kind
+        });
+
+    }
+
+    items.sort((a, b) => {
+
+        if (a.kind !== b.kind) {
+
+            return a.kind === "directory"
+                ? -1
+                : 1;
+
+        }
+
+        return a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+                numeric: true,
+                sensitivity: "base"
+            }
+        );
+
+    });
+
+    return items;
+
+}
+
+
+/* ---------------------------------------------------------
+   RENDER FILES
+--------------------------------------------------------- */
+
+async function renderFiles() {
+
+    if (!currentDirectory) return;
+
+    const grid =
+        document.getElementById("fileGrid");
+
+    grid.innerHTML = "";
+
+    const search =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+    try {
+
+        let items =
+            await getDirectoryItems(
+                currentDirectory
+            );
+
+        if (search) {
+
+            items =
+                items.filter(item =>
+                    item.name
+                        .toLowerCase()
+                        .includes(search)
+                );
+
+        }
+
+        if (items.length === 0) {
+
+            grid.innerHTML = `
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        ${search ? "🔎" : "📂"}
+                    </div>
+
+                    <h3>
+                        ${search
+                            ? "No matching files"
+                            : "This folder is empty"}
+                    </h3>
+
+                    <p>
+                        ${search
+                            ? "Try another search."
+                            : "Upload files or create a folder."}
+                    </p>
+
+                </div>
+
+            `;
+
+            updateBreadcrumb();
+
+            return;
+
+        }
+
+
+        for (const item of items) {
+
+            if (item.kind === "directory") {
+
+                createFolderCard(
+                    grid,
+                    item
+                );
+
+            } else {
+
+                await createFileCard(
+                    grid,
+                    item
+                );
+
+            }
+
+        }
+
+        updateBreadcrumb();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Could not read this folder."
+        );
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   FOLDER CARD
+--------------------------------------------------------- */
+
+function createFolderCard(
+    grid,
+    item
+) {
+
+    const card =
+        document.createElement("div");
+
+    card.className = "card";
+
+    card.innerHTML = `
+
+        <div class="card-icon">
+            📁
+        </div>
+
+        <div class="card-name">
+            ${escapeHTML(item.name)}
+        </div>
+
+        <div class="card-meta">
+            Folder
+        </div>
+
+        <div class="card-actions">
+
+            <button>
+                Open
+            </button>
+
+            <button class="rename-btn">
+                Rename
+            </button>
+
+            <button class="delete-btn">
+                Delete
+            </button>
+
+        </div>
+
+    `;
+
+
+    card.querySelector("button")
+        .onclick = () => openFolder(item.handle);
+
+
+    card.querySelector(".rename-btn")
+        .onclick = () => renameItem(item);
+
+
+    card.querySelector(".delete-btn")
+        .onclick = () => deleteItem(item);
+
+
+    grid.appendChild(card);
+
+}
+
+
+/* ---------------------------------------------------------
+   FILE CARD
+--------------------------------------------------------- */
+
+async function createFileCard(
+    grid,
+    item
+) {
+
+    const file =
+        await item.handle.getFile();
+
+    const card =
+        document.createElement("div");
+
+    card.className = "card";
+
+    card.innerHTML = `
+
+        <div class="card-icon">
+            ${getFileIcon(item.name)}
+        </div>
+
+        <div class="card-name">
+            ${escapeHTML(item.name)}
+        </div>
+
+        <div class="card-meta">
+            ${formatBytes(file.size)}
+            ·
+            ${getExtension(item.name)}
+        </div>
+
+        <div class="card-actions">
+
+            <button class="open-btn">
+                Open
+            </button>
+
+            <button class="rename-btn">
+                Rename
+            </button>
+
+            <button class="delete-btn">
+                Delete
+            </button>
+
+        </div>
+
+    `;
+
+
+    card.querySelector(".open-btn")
+        .onclick = () =>
+            openFile(file);
+
+
+    card.querySelector(".rename-btn")
+        .onclick = () =>
+            renameItem(item);
+
+
+    card.querySelector(".delete-btn")
+        .onclick = () =>
+            deleteItem(item);
+
+
+    grid.appendChild(card);
+
+}
+
+
+/* ---------------------------------------------------------
+   OPEN FOLDER
+--------------------------------------------------------- */
+
+async function openFolder(handle) {
+
+    directoryStack.push(
+        currentDirectory
+    );
+
+    currentDirectory = handle;
+
+    document.getElementById("backBtn")
+        .disabled = false;
+
+    await renderFiles();
+
+}
+
+
+/* ---------------------------------------------------------
+   GO BACK
+--------------------------------------------------------- */
+
+async function goBack() {
+
+    if (directoryStack.length === 0)
+        return;
+
+    currentDirectory =
+        directoryStack.pop();
+
+    document.getElementById("backBtn")
+        .disabled =
+        directoryStack.length === 0;
+
+    await renderFiles();
+
+}
+
+
+/* ---------------------------------------------------------
+   OPEN FILE
+--------------------------------------------------------- */
+
+function openFile(file) {
+
+    const url =
+        URL.createObjectURL(file);
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+    setTimeout(() => {
+
+        URL.revokeObjectURL(url);
+
+    }, 60000);
+
+}
+
+
+/* ---------------------------------------------------------
+   RENAME
+--------------------------------------------------------- */
+
+async function renameItem(item) {
+
+    const newName =
+        prompt(
+            "Enter new name:",
+            item.name
+        );
+
+    if (
+        !newName ||
+        newName === item.name
+    ) return;
+
+
+    try {
+
+        if (item.kind === "file") {
+
+            const file =
+                await item.handle.getFile();
+
+            const newFile =
+                await currentDirectory.getFileHandle(
+                    newName,
+                    {
+                        create: true
+                    }
+                );
+
+            const writable =
+                await newFile.createWritable();
+
+            await writable.write(file);
+
+            await writable.close();
+
+        } else {
+
+            const newFolder =
+                await currentDirectory.getDirectoryHandle(
+                    newName,
+                    {
+                        create: true
+                    }
+                );
+
+            await copyDirectory(
+                item.handle,
+                newFolder
+            );
+
+        }
+
+
+        await currentDirectory.removeEntry(
+            item.name,
+            {
+                recursive: item.kind === "directory"
+            }
+        );
+
+
+        showToast("Renamed");
+
+        await renderFiles();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Rename failed"
+        );
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   COPY DIRECTORY
+--------------------------------------------------------- */
+
+async function copyDirectory(
+    source,
+    destination
+) {
+
+    for await (const [
+        name,
+        handle
+    ] of source.entries()) {
+
+        if (handle.kind === "file") {
+
+            const file =
+                await handle.getFile();
+
+            const newFile =
+                await destination.getFileHandle(
+                    name,
+                    {
+                        create: true
+                    }
+                );
+
+            const writable =
+                await newFile.createWritable();
+
+            await writable.write(file);
+
+            await writable.close();
+
+        } else {
+
+            const newFolder =
+                await destination.getDirectoryHandle(
+                    name,
+                    {
+                        create: true
+                    }
+                );
+
+            await copyDirectory(
+                handle,
+                newFolder
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   DELETE
+--------------------------------------------------------- */
+
+async function deleteItem(item) {
+
+    const confirmed =
+        confirm(
+            `Delete "${item.name}"?`
+        );
+
+    if (!confirmed) return;
+
+    try {
+
+        await currentDirectory.removeEntry(
+            item.name,
+            {
+                recursive:
+                    item.kind === "directory"
+            }
+        );
+
+        showToast("Deleted");
+
+        await renderFiles();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Could not delete item"
+        );
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   REFRESH
+--------------------------------------------------------- */
+
+async function refreshFiles() {
+
+    await renderFiles();
+
+    showToast("Refreshed");
+
+}
+
+
+/* ---------------------------------------------------------
+   BREADCRUMB
+--------------------------------------------------------- */
+
+function updateBreadcrumb() {
+
+    let text =
+        vaultHandle
+            ? vaultHandle.name
+            : "Vault";
+
+    if (directoryStack.length > 0) {
+
+        text +=
+            " / " +
+            "… / " +
+            currentDirectory.name;
+
+    }
+
+    document.getElementById(
+        "breadcrumb"
+    ).textContent = text;
+
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+function getLinks() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                "vaultLinks"
+            ) || "[]"
+        );
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveLinks(links) {
+
+    localStorage.setItem(
+        "vaultLinks",
+        JSON.stringify(links)
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   OPEN MODAL
+--------------------------------------------------------- */
+
+function openLinkModal() {
+
+    document
+        .getElementById("linkModal")
+        .classList
+        .add("show");
+
+    document
+        .getElementById("linkTitle")
+        .focus();
+
+}
+
+
+/* ---------------------------------------------------------
+   CLOSE MODAL
+--------------------------------------------------------- */
+
+function closeLinkModal() {
+
+    document
+        .getElementById("linkModal")
+        .classList
+        .remove("show");
+
+}
+
+
+/* ---------------------------------------------------------
+   SAVE LINK
+--------------------------------------------------------- */
+
+function saveLink() {
+
+    const title =
+        document
+            .getElementById("linkTitle")
+            .value
+            .trim();
+
+    const url =
+        document
+            .getElementById("linkURL")
+            .value
+            .trim();
+
+    const description =
+        document
+            .getElementById("linkDescription")
+            .value
+            .trim();
+
+
+    if (!title || !url) {
+
+        showToast(
+            "Title and URL are required"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        new URL(url);
+
+    } catch {
+
+        showToast(
+            "Enter a valid URL"
+        );
+
+        return;
+
+    }
+
+
+    const links =
+        getLinks();
+
+    links.push({
+
+        id: Date.now(),
+
+        title,
+
+        url,
+
+        description
+
+    });
+
+
+    saveLinks(links);
+
+    closeLinkModal();
+
+    document.getElementById(
+        "linkTitle"
+    ).value = "";
+
+    document.getElementById(
+        "linkURL"
+    ).value = "";
+
+    document.getElementById(
+        "linkDescription"
+    ).value = "";
+
+
+    renderLinks();
+
+    showToast("Link saved");
+
+}
+
+
+/* ---------------------------------------------------------
+   RENDER LINKS
+--------------------------------------------------------- */
+
+function renderLinks() {
+
+    const container =
+        document.getElementById(
+            "linksGrid"
+        );
+
+    const links =
+        getLinks();
+
+    container.innerHTML = "";
+
+
+    if (links.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    🔗
+                </div>
+
+                <p>
+                    No saved links yet.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    links.forEach(link => {
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+        card.className =
+            "link-card";
+
+
+        card.innerHTML = `
+
+            <div class="link-title">
+                ${escapeHTML(link.title)}
+            </div>
+
+            <div class="link-url">
+                ${escapeHTML(link.url)}
+            </div>
+
+            ${
+                link.description
+                ? `
+                    <div class="link-description">
+                        ${escapeHTML(
+                            link.description
+                        )}
+                    </div>
+                `
+                : ""
+            }
+
+            <div class="link-actions">
+
+                <button class="open-link">
+                    Open
+                </button>
+
+                <button class="copy-link">
+                    Copy
+                </button>
+
+                <button class="delete-link">
+                    Delete
+                </button>
+
+            </div>
+
+        `;
+
+
+        card.querySelector(
+            ".open-link"
+        ).onclick = () => {
+
+            window.open(
+                link.url,
+                "_blank",
+                "noopener"
+            );
+
+        };
+
+
+        card.querySelector(
+            ".copy-link"
+        ).onclick = async () => {
+
+            await navigator.clipboard.writeText(
+                link.url
+            );
+
+            showToast(
+                "Link copied"
+            );
+
+        };
+
+
+        card.querySelector(
+            ".delete-link"
+        ).onclick = () => {
+
+            const confirmed =
+                confirm(
+                    "Delete this link?"
+                );
+
+            if (!confirmed) return;
+
+            const updated =
+                getLinks().filter(
+                    x => x.id !== link.id
+                );
+
+            saveLinks(updated);
+
+            renderLinks();
+
+            showToast(
+                "Link deleted"
+            );
+
+        };
+
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+function getExtension(name) {
+
+    const parts =
+        name.split(".");
+
+    if (parts.length < 2)
+        return "FILE";
+
+    return parts
+        .pop()
+        .toUpperCase();
+
+}
+
+
+function getFileIcon(name) {
+
+    const ext =
+        getExtension(name)
+            .toLowerCase();
+
+    const icons = {
+
+        pdf: "📕",
+
+        zip: "📦",
+        rar: "📦",
+        "7z": "📦",
+
+        jpg: "🖼️",
+        jpeg: "🖼️",
+        png: "🖼️",
+        gif: "🖼️",
+        webp: "🖼️",
+
+        mp4: "🎬",
+        mov: "🎬",
+        mkv: "🎬",
+
+        mp3: "🎵",
+        wav: "🎵",
+
+        txt: "📄",
+        md: "📝",
+
+        doc: "📘",
+        docx: "📘",
+
+        xls: "📊",
+        xlsx: "📊",
+
+        ppt: "📊",
+        pptx: "📊",
+
+        js: "🟨",
+        html: "🌐",
+        css: "🎨",
+
+        py: "🐍",
+
+        ino: "🔧",
+
+        exe: "⚙️",
+        dmg: "💿",
+
+        json: "🧾",
+
+        csv: "📊"
+
+    };
+
+    return icons[ext] || "📄";
+
+}
+
+
+function formatBytes(bytes) {
+
+    if (bytes === 0)
+        return "0 B";
+
+    const units = [
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB"
+    ];
+
+    const i =
+        Math.floor(
+            Math.log(bytes) /
+            Math.log(1024)
+        );
+
+    return (
+        bytes /
+        Math.pow(1024, i)
+    ).toFixed(
+        i === 0 ? 0 : 1
+    ) + " " + units[i];
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* ---------------------------------------------------------
+   TOAST
+--------------------------------------------------------- */
+
+let toastTimer;
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent = message;
+
+    toast.classList.add(
+        "show"
+    );
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(() => {
+
+            toast.classList.remove(
+                "show"
+            );
+
+        }, 3000);
+
+}
+
+
+/* ---------------------------------------------------------
+   INITIALIZE
+--------------------------------------------------------- */
+
+renderLinks();
+
+</script>
+
+</body>
+</html>
+```
